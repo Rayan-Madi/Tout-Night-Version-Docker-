@@ -1,0 +1,57 @@
+# Créer le fichier .gitignore
+echo. > .gitignore
+```
+
+Contenu de `.gitignore` :
+```
+# Python
+backend/venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend/db.sqlite3
+backend/*.log
+backend/media/
+backend/staticfiles/
+
+# Node.js
+realtime/node_modules/
+frontend/node_modules/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build files
+frontend/dist/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+```
+
+---
+
+## ✅ Récapitulatif Final
+
+### Architecture déployée
+```
+✅ Django REST API       → http://localhost:8000
+✅ Node.js WebSocket     → http://localhost:4000
+✅ React Frontend        → http://localhost:5173
+✅ MySQL Database        → localhost:3306
