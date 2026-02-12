@@ -13,4 +13,8 @@ urlpatterns = [
     
     # Mettre à jour le statut
     path('<slug:slug>/status/', views.update_event_status, name='event-status'),
+
+    # Mes événements
+    path('my-events/', views.MyEventsView.as_view(), name='my-events'),
+
 ]

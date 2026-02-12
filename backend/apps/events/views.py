@@ -3,9 +3,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 from .models import Event
 from .serializers import (
-    EventSerializer,
     EventCreateSerializer,
     EventListSerializer
 )
@@ -33,30 +33,58 @@ class EventListCreateView(generics.ListCreateAPIView):
         return [AllowAny()]
     
     def perform_create(self, serializer):
-        serializer.save(organizer=self.request.user)
+        print(f"🔍 User connecté: {self.request.user}")
+        print(f"🔍 User ID: {self.request.user.id}")
+        print(f"🔍 User authenticated: {self.request.user.is_authenticated}")
+        
+        # Sauvegarder avec l'organisateur
+        event = serializer.save(organizer=self.request.user)
+        
+        print(f"✅ Event créé avec organizer: {event.organizer}")
+        print(f"✅ Event ID: {event.id}")
 
 
 class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Détails, mise à jour et suppression d'un événement"""
+    """Détails, mise à jour et suppression d'un événement (par slug OU par ID)"""
     
     queryset = Event.objects.all()
-    serializer_class = EventSerializer
-    lookup_field = 'slug'
+    serializer_class = EventListSerializer
     
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             return [IsAuthenticated(), IsOrganizerOrReadOnly()]
         return [AllowAny()]
+    
+    def get_object(self):
+        """
+        Récupère l'événement par slug OU par ID
+        """
+        lookup_value = self.kwargs.get('slug')
+        
+        # Essayer d'abord par slug
+        try:
+            return Event.objects.get(slug=lookup_value)
+        except Event.DoesNotExist:
+            pass
+        
+        # Si ça échoue, essayer par ID
+        try:
+            event_id = int(lookup_value)
+            return Event.objects.get(id=event_id)
+        except (ValueError, Event.DoesNotExist):
+            pass
+        
+        # Si aucun ne marche, lever une 404
+        from rest_framework.exceptions import NotFound
+        raise NotFound("Événement introuvable")
 
 
 class MyEventsView(generics.ListAPIView):
-    """Liste des événements créés par l'utilisateur connecté"""
-    
     serializer_class = EventListSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
-        return Event.objects.filter(organizer=self.request.user)
+        return Event.objects.filter(organizer=self.request.user).order_by('-created_at')
 
 
 @api_view(['PATCH'])
@@ -83,5 +111,5 @@ def update_event_status(request, slug):
     
     return Response({
         "message": "Statut mis à jour avec succès",
-        "event": EventSerializer(event).data
+        "event": EventListSerializer(event).data
     })

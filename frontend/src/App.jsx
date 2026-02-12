@@ -1,12 +1,14 @@
-import MyEvents from './pages/MyEvents';
-import MyTickets from './pages/MyTickets';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import EventList from './pages/EventList';
+import EventDetail from './pages/EventDetail';
 import EventChat from './pages/EventChat';
+import EditEvent from './pages/EditEvent';  
+import MyTickets from './pages/MyTickets';
+import MyEvents from './pages/MyEvents';
 import './App.css';
 
 function App() {
@@ -20,12 +22,12 @@ function App() {
             <Route path="/" element={
               <div className="home-container">
                 <header className="home-header">
-                  <h1>🎉 Tout Night</h1>
-                  <p>Architecture fullstack professionnelle</p>
+                  <h1>🎉Tout Night !</h1>
+                  <p>L'Application qui ne dors jamais </p>
                   <div className="status">
-                    <span className="status-item">✅ Django REST API</span>
-                    <span className="status-item">✅ Node.js WebSocket</span>
-                    <span className="status-item">✅ React + Vite</span>
+                    <span className="status-item"></span>
+                    <span className="status-item"></span>
+                    <span className="status-item"></span>
                   </div>
                 </header>
 
@@ -49,26 +51,14 @@ function App() {
                 </div>
               </div>
             } />
-            <Route path="/my-events" element={<MyEvents />} />
-            <Route path="/my-tickets" element={<MyTickets />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/events" element={<EventList />} />
+            <Route path="/events/:slug" element={<EventDetail />} />
             <Route path="/events/:slug/chat" element={<EventChat />} />
-            
-            <Route path="/my-events" element={
-              <div className="page-container">
-                <h1>🎉 Mes Événements</h1>
-                <p>Page en cours de développement...</p>
-              </div>
-            } />
-            
-            <Route path="/my-tickets" element={
-              <div className="page-container">
-                <h1>🎫 Mes Billets</h1>
-                <p>Page en cours de développement...</p>
-              </div>
-            } />
+            <Route path="/events/:slug/edit" element={<EditEvent />} /> 
+            <Route path="/my-tickets" element={<MyTickets />} />
+            <Route path="/my-events" element={<MyEvents />} />
           </Routes>
         </div>
       </Router>

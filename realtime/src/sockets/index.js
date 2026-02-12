@@ -1,7 +1,7 @@
 const { Server } = require('socket.io');
-const { socketAuth } = require('../middlewares/auth.middleware');
 const handleChatEvents = require('./chat.socket');
 const handleEventSocket = require('./event.socket');
+const socketAuthMiddleware = require('../middlewares/auth.middleware');
 
 /**
  * Initialise Socket.IO avec authentification
@@ -9,31 +9,37 @@ const handleEventSocket = require('./event.socket');
 const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:5173', // React dev server
-      credentials: true,
+      origin: [
+        "http://localhost",
+        "http://localhost:5173",
+        "http://localhost:8000"
+      ],
+      methods: ["GET", "POST"],
+      credentials: true
     },
   });
-  
-  // Middleware d'authentification
-  io.use(socketAuth);
-  
-  // Gestion des connexions
-  io.on('connection', (socket) => {
-    console.log(`✅ Utilisateur connecté: ${socket.username} (ID: ${socket.userId})`);
-    
-    // Rejoindre une room personnelle (pour les notifications)
-    socket.join(`user:${socket.userId}`);
-    
-    // Enregistrer les gestionnaires d'événements
+
+  // ✅ AJOUTER LE MIDDLEWARE D'AUTHENTIFICATION
+  io.use(socketAuthMiddleware);
+
+  io.on("connection", (socket) => {
+    console.log(
+      `✅ Utilisateur connecté: ${socket.username} (ID: ${socket.userId})`
+    );
+
+    // Rejoindre la room personnelle de l'utilisateur
+    if (socket.userId) {
+      socket.join(`user:${socket.userId}`);
+    }
+
     handleChatEvents(socket, io);
     handleEventSocket(socket, io);
-    
-    // Déconnexion
-    socket.on('disconnect', () => {
+
+    socket.on("disconnect", () => {
       console.log(`❌ Utilisateur déconnecté: ${socket.username}`);
     });
   });
-  
+
   return io;
 };
 

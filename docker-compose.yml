@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: toutnight_mysql 
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: toutnight_db 
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_USER: ${DB_USER:-toutnight_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-ToutNight2026}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3307:3306"
+    networks:
+      - toutnight_network 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  django:
+    build:
+      context: .
+      dockerfile: docker/django.Dockerfile
+    container_name: toutnight_django  
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-False}
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: toutnight_db 
+      DB_USER: ${DB_USER:-toutnight_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      REALTIME_SERVICE_URL: http://nodejs:4000
+    volumes:
+      - ./backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - toutnight_network  
+
+  nodejs:
+    build:
+      context: .
+      dockerfile: docker/node.Dockerfile
+    container_name: toutnight_nodejs  
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      JWT_SECRET: ${SECRET_KEY}
+      DB_HOST: mysql
+      DB_USER: ${DB_USER:-toutnight_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: toutnight_db  
+      DB_PORT: 3306
+    volumes:
+      - ./realtime:/app
+      - /app/node_modules
+    ports:
+      - "4000:4000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - toutnight_network  
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.Dockerfile
+    container_name: toutnight_nginx  
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - django
+      - nodejs
+    networks:
+      - toutnight_network  
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+
+networks:
+  toutnight_network:  
+    driver: bridge
+
+volumes:
+  mysql_data:
+    external: true
+    name: event-platform_mysql_data  
+  static_volume:
+  media_volume:

@@ -1,0 +1,964 @@
+.event-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* === BACK LINK === */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  transition: all var(--transition-base);
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+/* === HERO SECTION === */
+.event-detail-hero {
+  width: 100%;
+  max-height: 500px;
+  margin-bottom: 2.5rem;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === MAIN LAYOUT === */
+.event-detail-content {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.event-main-info {
+  min-width: 0;
+}
+
+/* === CATEGORY === */
+.detail-category {
+  display: inline-block;
+  padding: 0.375rem 1rem;
+  background: rgba(201, 169, 97, 0.15);
+  color: var(--gold-soft);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.event-main-info h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+
+/* === META SECTION === */
+.event-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.meta-item {
+  display: flex;
+  gap: 1rem;
+}
+
+.meta-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.meta-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.meta-subvalue {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* === DESCRIPTION === */
+.event-description {
+  margin-bottom: 2rem;
+}
+
+.event-description h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.event-description p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* === CHAT LINK === */
+.chat-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.chat-link-btn:hover {
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  border-color: var(--gold-muted);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+
+/* === BOOKING CARD === */
+.event-booking-card {
+  position: sticky;
+  top: 100px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* === PRICE SECTION === */
+.booking-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.price-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.price-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--gold-muted);
+}
+
+/* === AVAILABILITY === */
+.booking-availability {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.seats-available {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.seats-total {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* === QUANTITY SELECTOR === */
+.quantity-selector {
+  margin-bottom: 1.5rem;
+}
+
+.quantity-selector label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.qty-btn {
+  width: 48px;
+  height: 48px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.qty-btn:hover {
+  background: var(--gold-muted);
+  color: var(--night-black);
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+.qty-value {
+  flex: 1;
+  text-align: center;
+  padding: 0 1rem;
+  background: var(--surface-3);
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* === TOTAL PRICE === */
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+}
+
+.total-price span:first-child {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.total-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--gold-muted);
+}
+
+/* === PURCHASE BUTTON === */
+.purchase-btn {
+  width: 100%;
+  padding: 1.125rem 2rem;
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.purchase-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.purchase-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.purchase-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg), var(--glow-gold);
+}
+
+.purchase-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.purchase-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === SOLD OUT === */
+.sold-out {
+  text-align: center;
+  padding: 2rem;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+}
+
+.sold-out p {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* === ERROR / LOADING === */
+.detail-loading,
+.detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 3rem;
+  text-align: center;
+}
+
+.detail-error h2 {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.back-btn {
+  display: inline-flex;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-gold);
+}
+
+/* === HEADER === */
+.detail-header {
+  margin-bottom: 2.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-xs);
+}
+
+.back-arrow {
+  font-size: 1.125rem;
+  transition: transform var(--transition-base);
+}
+
+.back-link:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+  transform: translateX(-4px);
+}
+
+.back-link:hover .back-arrow {
+  transform: translateX(-3px);
+}
+
+/* === GRID LAYOUT === */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* === MAIN CONTENT === */
+.detail-main {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-md);
+}
+
+.event-badge-category {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: rgba(201, 169, 97, 0.15);
+  color: var(--gold-soft);
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+}
+
+.detail-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+
+/* === META CARDS === */
+.detail-meta-grid {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.meta-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.meta-card:hover {
+  background: var(--surface-3);
+  border-color: var(--border-medium);
+  transform: translateX(4px);
+}
+
+.meta-icon-box {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(205, 127, 50, 0.15));
+  border: 1px solid rgba(201, 169, 97, 0.3);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.meta-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.meta-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.meta-subvalue {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* === DIVIDER === */
+.detail-divider {
+  position: relative;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 2.5rem 0;
+}
+
+.detail-divider::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface-1);
+  padding: 0 1.25rem;
+  color: var(--gold-muted);
+  font-size: 1rem;
+}
+
+/* === DESCRIPTION === */
+.detail-description h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.detail-description p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* === CHAT BUTTON === */
+.btn-chat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.25rem 2rem;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 2rem;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-chat:hover {
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  border-color: var(--gold-muted);
+  box-shadow: var(--shadow-md), var(--glow-gold);
+}
+
+.chat-indicator {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+}
+
+/* === SIDEBAR === */
+.detail-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.booking-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* Booking header */
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.booking-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.booking-price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.75rem;
+  font-weight: 600;
+  color: var(--gold-muted);
+}
+
+/* Availability bar */
+.availability-bar {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.availability-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-muted), var(--gold-soft));
+  border-radius: var(--radius-xs);
+  transition: width 0.5s var(--ease-smooth);
+}
+
+.availability-text {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.seats-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.seats-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* === QUANTITY CONTROLS === */
+.quantity-section {
+  margin-bottom: 1.75rem;
+}
+
+.quantity-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+}
+
+.quantity-controls {
+  display: flex;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+
+.qty-btn {
+  flex: 1;
+  padding: 1rem;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: none;
+  font-size: 1.5rem;
+  font-weight: 600;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.qty-btn:first-child {
+  border-right: 1px solid var(--border-subtle);
+}
+
+.qty-btn:last-child {
+  border-left: 1px solid var(--border-subtle);
+}
+
+.qty-btn:hover {
+  background: var(--gold-muted);
+  color: var(--night-black);
+}
+
+.qty-display {
+  flex: 2;
+  text-align: center;
+  padding: 1rem;
+  background: var(--surface-3);
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-left: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* === TOTAL === */
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 1.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.75rem;
+}
+
+.total-label {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.total-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--gold-muted);
+}
+
+/* === PURCHASE BUTTON === */
+.btn-purchase {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.375rem 2rem;
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.btn-purchase::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.btn-purchase:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btn-purchase:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg), var(--glow-gold);
+}
+
+.btn-purchase:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-purchase:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(13, 13, 13, 0.3);
+  border-top-color: var(--night-black);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.booking-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* === SOLD OUT === */
+.sold-out-card {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--surface-2);
+  border: 2px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+}
+
+.sold-out-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--night-slate);
+  color: var(--text-muted);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.sold-out-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.sold-out-subtext {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* === LOADING & ERROR STATES === */
+.detail-loading,
+.detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 3rem;
+}
+
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border: 3px solid var(--surface-2);
+  border-top-color: var(--gold-muted);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.detail-error h2 {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--gold-muted), var(--bronze));
+  color: var(--night-black);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--glow-gold);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+  .event-detail-content {
+    grid-template-columns: 1fr;
+  }
+
+  .event-booking-card {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .event-detail-container {
+    padding: 1.5rem;
+  }
+
+  .event-booking-card {
+    padding: 1.5rem;
+  }
+
+  .event-main-info h1 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+  }
+}

@@ -1,73 +1,86 @@
-const pool = require('../config/db');
+const db = require('../config/db');
 
 class MessageService {
   /**
-   * Sauvegarder un message dans la base de données
+   * Récupérer les messages d'un événement
    */
-  static async saveMessage(eventId, userId, username, message) {
+  async getEventMessages(eventId, limit = 50) {
     try {
-      const query = `
-        INSERT INTO chat_messages (event_id, user_id, username, message, created_at)
-        VALUES (?, ?, ?, ?, NOW())
-      `;
+      // ✅ Convertir en nombre et inverser l'ordre des paramètres
+      const numericEventId = parseInt(eventId, 10);
+      const numericLimit = parseInt(limit, 10);
       
-      const [result] = await pool.execute(query, [eventId, userId, username, message]);
+      console.log(`📥 Récupération messages: event=${numericEventId}, limit=${numericLimit}`);
       
+      const [rows] = await db.execute(
+        `SELECT id, event_id, user_id, username, message, created_at
+         FROM chat_messages
+         WHERE event_id = ?
+         ORDER BY created_at ASC
+         LIMIT ?`,
+        [numericEventId, numericLimit]  // ✅ Ordre correct
+      );
+      
+      console.log(`✅ ${rows.length} messages récupérés`);
+      return rows;
+    } catch (error) {
+      console.error('Erreur getEventMessages:', error);
+      return []; // ✅ Retourner tableau vide en cas d'erreur
+    }
+  }
+
+  /**
+   * Créer un nouveau message
+   */
+  async createMessage(eventId, userId, username, message) {
+    try {
+      const numericEventId = parseInt(eventId, 10);
+      const numericUserId = userId ? parseInt(userId, 10) : null;
+      
+      console.log(`💾 Sauvegarde message: event=${numericEventId}, user=${numericUserId}, username=${username}`);
+      
+      const [result] = await db.execute(
+        `INSERT INTO chat_messages (event_id, user_id, username, message, created_at)
+         VALUES (?, ?, ?, ?, NOW())`,
+        [numericEventId, numericUserId, username, message]
+      );
+
+      console.log(`✅ Message créé avec l'ID ${result.insertId}`);
+
+      // Retourner le message créé avec timestamp
       return {
         id: result.insertId,
-        eventId,
-        userId,
-        username,
-        message,
-        createdAt: new Date(),
+        event_id: numericEventId,
+        user_id: numericUserId,
+        username: username,
+        message: message,
+        created_at: new Date()
       };
     } catch (error) {
-      console.error('Erreur sauvegarde message:', error);
+      console.error('Erreur createMessage:', error);
       throw error;
     }
   }
 
   /**
-   * Récupérer l'historique des messages d'un événement
+   * Supprimer un message
    */
-  static async getEventMessages(eventId, limit = 50) {
+  async deleteMessage(messageId, userId) {
     try {
-      const query = `
-        SELECT id, event_id, user_id, username, message, created_at
-        FROM chat_messages
-        WHERE event_id = ?
-        ORDER BY created_at DESC
-        LIMIT ?
-      `;
+      const numericMessageId = parseInt(messageId, 10);
+      const numericUserId = parseInt(userId, 10);
       
-      const [rows] = await pool.execute(query, [eventId, limit]);
-      
-      return rows.reverse(); // Ordre chronologique
-    } catch (error) {
-      console.error('Erreur récupération messages:', error);
-      return [];
-    }
-  }
+      const [result] = await db.execute(
+        'DELETE FROM chat_messages WHERE id = ? AND user_id = ?',
+        [numericMessageId, numericUserId]
+      );
 
-  /**
-   * Supprimer les anciens messages (nettoyage)
-   */
-  static async cleanOldMessages(daysOld = 30) {
-    try {
-      const query = `
-        DELETE FROM chat_messages
-        WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)
-      `;
-      
-      const [result] = await pool.execute(query, [daysOld]);
-      
-      console.log(`${result.affectedRows} anciens messages supprimés`);
-      return result.affectedRows;
+      return result.affectedRows > 0;
     } catch (error) {
-      console.error('Erreur nettoyage messages:', error);
-      throw error;
+      console.error('Erreur deleteMessage:', error);
+      return false;
     }
   }
 }
 
-module.exports = MessageService;
+module.exports = new MessageService();

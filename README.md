@@ -1,6 +1,6 @@
-# 🎉 Event Platform - Plateforme d'Événements en Temps Réel
+# 🎉 ToutNight - Plateforme d'Événements en Temps Réel
 
-Architecture fullstack professionnelle combinant Django REST API, Node.js WebSocket et React.
+Architecture fullstack professionnelle combinant Django REST API, Node.js WebSocket et React, orchestrée avec Docker.
 
 ## 📋 Table des matières
 
@@ -11,17 +11,18 @@ Architecture fullstack professionnelle combinant Django REST API, Node.js WebSoc
 - [Structure du projet](#structure-du-projet)
 - [Fonctionnalités](#fonctionnalités)
 - [API Documentation](#api-documentation)
+- [Dépannage](#dépannage)
 
 ## 🚀 Technologies
 
 ### Backend
-- **Django 5.x** - Framework web Python
+- **Django 6.x** - Framework web Python
 - **Django REST Framework** - API RESTful
 - **Simple JWT** - Authentification par tokens
-- **MySQL** - Base de données relationnelle
+- **MySQL 8.0** - Base de données relationnelle
 
 ### Temps Réel
-- **Node.js** - Runtime JavaScript
+- **Node.js 18** - Runtime JavaScript
 - **Express** - Framework web minimaliste
 - **Socket.IO** - Communication bidirectionnelle en temps réel
 - **MySQL2** - Client MySQL pour Node.js
@@ -33,117 +34,127 @@ Architecture fullstack professionnelle combinant Django REST API, Node.js WebSoc
 - **Socket.IO Client** - Client WebSocket
 - **React Router** - Routing côté client
 
+### Infrastructure
+- **Docker & Docker Compose** - Conteneurisation
+- **Nginx** - Reverse proxy et serveur web
+- **Gunicorn** - Serveur WSGI pour Django
+
 ## 📦 Prérequis
 
-- Python 3.10+
-- Node.js 18+
-- MySQL 8.0+
-- Git
+- **Docker Desktop** (Windows/Mac) ou **Docker Engine + Docker Compose** (Linux)
+- **Git**
+
+C'est tout ! Plus besoin d'installer Python, Node.js ou MySQL séparément.
 
 ## 🛠️ Installation
 
 ### 1. Cloner le projet
-
 ```bash
-git clone <votre-repo>
+git clone https://github.com/Rayan-Madi/Tout-Night-
 cd event-platform
 ```
 
-### 2. Backend Django
+### 2. Configurer les variables d'environnement
 
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-```
-
-Créer `.env` dans `backend/` :
-
+Créer un fichier `.env` à la racine du projet :
 ```env
-SECRET_KEY=votre-cle-secrete
+# Django
+SECRET_KEY=votre-cle-secrete-ultra-longue-et-complexe
 DEBUG=True
-DB_ENGINE=django.db.backends.mysql
-DB_NAME=event_platform_db
-DB_USER=root
-DB_PASSWORD=votre_mot_de_passe
-DB_HOST=127.0.0.1
+
+# Base de données MySQL
+DB_NAME=toutnight_db
+DB_USER=toutnight_user
+DB_PASSWORD=VotreMotDePasseSecurise2026
+DB_HOST=mysql
 DB_PORT=3306
-REALTIME_SERVICE_URL=http://localhost:4000
+
+# JWT
+JWT_SECRET=votre-cle-jwt-secrete
 ```
 
+### 3. Construire et lancer les conteneurs
 ```bash
-python manage.py migrate
-python manage.py createsuperuser
+# Construire les images Docker
+docker-compose build
+
+# Lancer tous les services
+docker-compose up -d
 ```
 
-### 3. Serveur temps réel Node.js
+Les services démarrent automatiquement :
+- ✅ MySQL (port 3307)
+- ✅ Django API (port 8000)
+- ✅ Node.js WebSocket (port 4000)
+- ✅ Nginx (port 80)
 
+### 4. Initialiser la base de données
 ```bash
-cd realtime
-npm install
+# Créer les tables
+docker-compose exec django python manage.py migrate
+
+# Créer un superutilisateur
+docker-compose exec django python manage.py createsuperuser
+
+# (Optionnel) Générer des événements factices
+docker-compose exec django python seed_events.py
 ```
 
-Créer `.env` dans `realtime/` :
-
-```env
-PORT=4000
-JWT_SECRET=votre-cle-secrete
-DB_HOST=127.0.0.1
-DB_USER=root
-DB_PASSWORD=votre_mot_de_passe
-DB_NAME=event_platform_db
-DB_PORT=3306
-```
-
-Créer les tables MySQL :
-
+### 5. Créer la table de chat
 ```bash
-mysql -u root -p event_platform_db < database.sql
-```
+# Se connecter à MySQL
+docker-compose exec mysql mysql -u root -p
 
-### 4. Frontend React
+# Entrer le mot de passe (celui de DB_PASSWORD dans .env)
+# Puis exécuter :
+USE toutnight_db;
 
-```bash
-cd frontend
-npm install
-```
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id INT NOT NULL,
+  user_id INT NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_event_id (event_id),
+  INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-Créer `.env` dans `frontend/` :
-
-```env
-VITE_API_URL=http://localhost:8000/api
-VITE_SOCKET_URL=http://localhost:4000
+exit;
 ```
 
 ## ▶️ Lancement du projet
 
-Ouvrir 3 terminaux :
-
-**Terminal 1 - Django** :
+### Démarrer tous les services
 ```bash
-cd backend
-venv\Scripts\activate
-python manage.py runserver
+docker-compose up -d
 ```
-➡️ API accessible sur `http://localhost:8000`
 
-**Terminal 2 - Node.js** :
-```bash
-cd realtime
-npm run dev
-```
-➡️ WebSocket accessible sur `http://localhost:4000`
+### Accéder à l'application
 
-**Terminal 3 - React** :
+- **Frontend** : http://localhost
+- **API Django** : http://localhost:8000
+- **Admin Django** : http://localhost:8000/admin
+- **WebSocket** : http://localhost:4000
+
+### Arrêter les services
 ```bash
-cd frontend
-npm run dev
+docker-compose down
 ```
-➡️ Interface accessible sur `http://localhost:5173`
+
+### Voir les logs
+```bash
+# Tous les services
+docker-compose logs -f
+
+# Service spécifique
+docker-compose logs -f django
+docker-compose logs -f nodejs
+docker-compose logs -f mysql
+docker-compose logs -f nginx
+```
 
 ## 📁 Structure du projet
-
 ```
 event-platform/
 ├── backend/                 # API Django
@@ -151,47 +162,57 @@ event-platform/
 │   │   ├── users/           # Gestion utilisateurs
 │   │   ├── events/          # Gestion événements
 │   │   ├── tickets/         # Gestion billets
-│   │   └── notifications/   # Client Node.js
+│   │   └── notifications/   # Notifications
 │   ├── config/              # Configuration Django
 │   └── manage.py
-├── realtime/                # Serveur WebSocket
+├── realtime/                # Serveur WebSocket Node.js
 │   └── src/
 │       ├── config/          # Config DB & JWT
 │       ├── sockets/         # Gestionnaires Socket.IO
-│       ├── routes/          # Routes HTTP
-│       └── services/        # Logique métier
+│       ├── services/        # Logique métier
+│       └── server.js
 ├── frontend/                # Application React
 │   └── src/
-│       ├── api/             # Axios
-│       ├── components/      # Composants
+│       ├── api/             # Client Axios
+│       ├── components/      # Composants réutilisables
 │       ├── contexts/        # Contexts React
-│       ├── pages/           # Pages
-│       └── sockets/         # Socket.IO client
+│       ├── pages/           # Pages de l'application
+│       └── sockets/         # Client Socket.IO
+├── docker/                  # Configuration Docker
+│   ├── django.Dockerfile
+│   ├── node.Dockerfile
+│   ├── nginx.Dockerfile
+│   └── nginx.conf
+├── docker-compose.yml
+├── .env                     # Variables d'environnement
 └── README.md
 ```
 
 ## ✨ Fonctionnalités
 
 ### Authentification
-- ✅ Inscription/Connexion
-- ✅ JWT tokens (access + refresh)
-- ✅ Profil utilisateur
+- ✅ Inscription/Connexion avec JWT
+- ✅ Tokens (access + refresh)
+- ✅ Profil utilisateur éditable
 
 ### Événements
-- ✅ Création d'événements
-- ✅ Liste et recherche
-- ✅ Filtrage par catégorie
-- ✅ Gestion des places disponibles
+- ✅ Création d'événements par les organisateurs
+- ✅ Liste et recherche avancée
+- ✅ Filtrage par catégorie, ville, date
+- ✅ Gestion automatique des places disponibles
+- ✅ Génération de slugs uniques
 
 ### Billets
-- ✅ Achat de billets
-- ✅ Annulation
-- ✅ Historique des achats
+- ✅ Système d'achat de billets
+- ✅ Annulation possible
+- ✅ Historique complet des achats
+- ✅ Numéros de billets uniques
 
 ### Temps Réel
 - ✅ Chat en direct par événement
 - ✅ Notifications instantanées
-- ✅ Indicateur "en train d'écrire"
+- ✅ Indicateur "utilisateur en train d'écrire"
+- ✅ Synchronisation en temps réel
 
 ## 📡 API Documentation
 
@@ -206,28 +227,56 @@ event-platform/
 ```
 
 **POST** `/api/token/refresh/` - Rafraîchir le token
+```json
+{
+  "refresh": "your_refresh_token"
+}
+```
 
 **POST** `/api/users/register/` - Inscription
+```json
+{
+  "username": "newuser",
+  "email": "user@example.com",
+  "password": "securepassword",
+  "first_name": "John",
+  "last_name": "Doe"
+}
+```
 
 ### Événements
 
 **GET** `/api/events/` - Liste des événements
-- Query params : `search`, `category`, `city`
+- Query params : `search`, `category`, `city`, `ordering`
 
 **GET** `/api/events/{slug}/` - Détails d'un événement
 
-**POST** `/api/events/` - Créer un événement (authentifié)
+**POST** `/api/events/` - Créer un événement (authentifié, organisateur)
+```json
+{
+  "title": "Concert Rock",
+  "description": "Super concert",
+  "category": "concert",
+  "start_date": "2026-06-15T20:00:00Z",
+  "end_date": "2026-06-15T23:00:00Z",
+  "location": "Zénith de Paris",
+  "address": "211 Avenue Jean Jaurès",
+  "city": "Paris",
+  "price": "45.00",
+  "capacity": 2000
+}
+```
 
-**GET** `/api/events/my-events/` - Mes événements
+**GET** `/api/events/my-events/` - Mes événements créés
 
 ### Billets
 
-**GET** `/api/tickets/` - Mes billets
+**GET** `/api/tickets/` - Mes billets achetés
 
 **POST** `/api/tickets/` - Acheter un billet
 ```json
 {
-  "event_id": 1,
+  "event": 1,
   "quantity": 2
 }
 ```
@@ -238,25 +287,114 @@ event-platform/
 
 ### Connexion
 ```javascript
-socket = io('http://localhost:4000', {
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:4000', {
   auth: { token: 'your_jwt_token' }
 });
 ```
 
 ### Chat
-- `join:event` - Rejoindre un chat
-- `leave:event` - Quitter un chat
-- `message:send` - Envoyer un message
-- `message:received` - Recevoir un message
+- **Émettre** `join_event` - Rejoindre le chat d'un événement
+```javascript
+  socket.emit('join_event', { eventId: 13, userId: 1, username: 'John' });
+```
+- **Émettre** `send_message` - Envoyer un message
+```javascript
+  socket.emit('send_message', {
+    eventId: 13,
+    userId: 1,
+    username: 'John',
+    message: 'Hello!'
+  });
+```
+- **Recevoir** `new_message` - Nouveau message reçu
+- **Recevoir** `previous_messages` - Historique des messages
 
 ### Notifications
-- `notifications:get` - Récupérer les notifications
-- `notification:received` - Nouvelle notification
+- **Recevoir** `notification` - Nouvelle notification
 
-## 👨‍💻 Auteur
+## 🛠️ Commandes utiles
 
-Votre nom - Event Platform
+### Gestion des conteneurs
+```bash
+# Voir l'état des conteneurs
+docker-compose ps
+
+# Reconstruire après modification du code
+docker-compose build
+docker-compose up -d
+
+# Redémarrer un service spécifique
+docker-compose restart django
+
+# Accéder au shell d'un conteneur
+docker-compose exec django bash
+docker-compose exec nodejs sh
+
+# Exécuter une commande Django
+docker-compose exec django python manage.py makemigrations
+docker-compose exec django python manage.py migrate
+```
+
+### Base de données
+```bash
+# Backup de la base de données
+docker-compose exec mysql mysqldump -u root -p toutnight_db > backup.sql
+
+# Restore
+docker-compose exec -T mysql mysql -u root -p toutnight_db < backup.sql
+
+# Accéder à MySQL
+docker-compose exec mysql mysql -u root -p
+```
+
+### Nettoyage
+```bash
+# Arrêter et supprimer les conteneurs
+docker-compose down
+
+# Supprimer aussi les volumes (⚠️ efface la base de données)
+docker-compose down -v
+
+# Nettoyer les images non utilisées
+docker system prune -a
+```
+
+## 🐛 Dépannage
+
+### Erreur CORS
+Si vous voyez des erreurs CORS dans la console :
+- Vérifiez que `corsheaders` est dans `INSTALLED_APPS`
+- Vérifiez que `CorsMiddleware` est en haut de `MIDDLEWARE`
+- Vérifiez `CORS_ALLOWED_ORIGINS` dans `settings.py`
+
+### Le chat ne fonctionne pas
+- Vérifiez que la table `chat_messages` existe
+- Vérifiez les logs Node.js : `docker-compose logs nodejs`
+- Vérifiez que le fichier `db.js` existe dans `realtime/src/config/`
+
+### Port déjà utilisé
+Si un port est déjà utilisé (80, 3307, 4000, 8000) :
+- Arrêtez le service qui utilise ce port
+- Ou modifiez les ports dans `docker-compose.yml`
+
+### Les migrations ne s'appliquent pas
+```bash
+docker-compose exec django python manage.py makemigrations
+docker-compose exec django python manage.py migrate
+docker-compose restart django
+```
+
+## 👨‍💻 Auteurs
+
+- **Rayan Madi** - Développement fullstack
+- **[Votre nom]** - Contributions
 
 ## 📄 Licence
 
 MIT
+
+## 🤝 Contribution
+
+Les pull requests sont les bienvenues ! Pour des changements majeurs, ouvrez d'abord une issue pour discuter de ce que vous aimeriez changer.

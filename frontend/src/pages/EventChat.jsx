@@ -34,32 +34,43 @@ function EventChat() {
     if (!event || !isAuthenticated) return;
 
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket) {
+      console.error('❌ Socket non initialisé');
+      return;
+    }
 
-    // Rejoindre le chat de l'événement
-    socket.emit('join:event', event.id);
+    console.log('🎯 Rejoindre événement:', event.id);
 
-    // Recevoir l'historique
-    socket.on('chat:history', (history) => {
+    socket.emit('join_event', event.id);
+
+    socket.on('previous_messages', (history) => {
+      console.log('📜 Messages précédents reçus:', history);
       setMessages(history);
     });
 
-    // Recevoir les nouveaux messages
-    socket.on('message:received', (message) => {
+    socket.on('new_message', (message) => {
+      console.log('💬 Nouveau message reçu:', message);
       setMessages((prev) => [...prev, message]);
     });
 
     // Utilisateur rejoint
-    socket.on('user:joined', (data) => {
-      console.log(data.message);
+    socket.on('user_joined', (data) => {
+      console.log('👥 Utilisateur rejoint:', data);
+    });
+
+    // Utilisateur quitté
+    socket.on('user_left', (data) => {
+      console.log('👋 Utilisateur quitté:', data);
     });
 
     // Nettoyage
     return () => {
-      socket.emit('leave:event', event.id);
-      socket.off('chat:history');
-      socket.off('message:received');
-      socket.off('user:joined');
+      console.log('🚪 Quitter événement:', event.id);
+      socket.emit('leave_event', event.id);
+      socket.off('previous_messages');
+      socket.off('new_message');
+      socket.off('user_joined');
+      socket.off('user_left');
     };
   }, [event, isAuthenticated]);
 
@@ -68,24 +79,37 @@ function EventChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-// Envoyer un message
-const handleSendMessage = (e) => {
-  e.preventDefault();
-  
-  if (!newMessage.trim() || !isAuthenticated || !user) return;
+  // Envoyer un message
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+    
+    console.log('🔍 Debug envoi message:');
+    console.log('  - eventId:', event?.id);
+    console.log('  - message:', newMessage);
+    console.log('  - user:', user);
+    
+    if (!newMessage.trim() || !isAuthenticated || !user) {
+      console.warn('⚠️ Conditions non remplies pour envoyer');
+      return;
+    }
 
-  const socket = getSocket();
-  if (!socket) return;
+    const socket = getSocket();
+    if (!socket) {
+      console.error('❌ Socket non disponible');
+      return;
+    }
 
-  socket.emit('message:send', {
-    eventId: event.id,
-    message: newMessage.trim(),
-    userId: user.id,           
-    username: user.username,   
-  });
+    console.log('📤 Envoi message...');
+    
+    socket.emit('send_message', {
+      eventId: event.id,
+      message: newMessage.trim(),
+      userId: user.id,           
+      username: user.username,   
+    });
 
-  setNewMessage('');
-};
+    setNewMessage('');
+  };
 
   if (loading) {
     return <div className="chat-loading">Chargement...</div>;
@@ -120,7 +144,7 @@ const handleSendMessage = (e) => {
         ) : (
           messages.map((msg, index) => (
             <div
-              key={index}
+              key={msg.id || index}
               className={`chat-message ${msg.userId === user?.id ? 'own-message' : ''}`}
             >
               <div className="message-header">

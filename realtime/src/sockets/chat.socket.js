@@ -1,97 +1,143 @@
-const MessageService = require('../services/message.service');
+const messageService = require('../services/message.service');
 
 /**
- * Gère les événements de chat
+ * Branche tous les événements de chat sur un socket déjà connecté
+ * @param {Socket} socket - Le socket de l'utilisateur
+ * @param {Server} io - L'instance Socket.IO
  */
-const handleChatEvents = (socket, io) => {
-  // Rejoindre le chat d'un événement
-  socket.on('join:event', async (eventId) => {
-    socket.join(`event:${eventId}`);
-    console.log(`👥 ${socket.username} a rejoint l'événement ${eventId}`);
-    
-    // Envoyer l'historique des messages
+module.exports = (socket, io) => {
+  console.log('🔥 chat.socket branché pour', socket.id);
+
+  // Rejoindre une room d'événement
+  socket.on('join_event', async (eventId) => {
     try {
-      const messages = await MessageService.getEventMessages(eventId);
-      socket.emit('chat:history', messages);
-    } catch (error) {
-      console.error('Erreur chargement historique:', error);
-    }
-    
-    // Notifier les autres participants
-    socket.to(`event:${eventId}`).emit('user:joined', {
-      username: socket.username,
-      message: `${socket.username} a rejoint le chat`,
-      timestamp: new Date(),
-    });
-  });
+      console.log(`📥 ${socket.id} rejoint l'événement ${eventId}`);
 
-  // Quitter le chat d'un événement
-  socket.on('leave:event', (eventId) => {
-    socket.leave(`event:${eventId}`);
-    console.log(`👋 ${socket.username} a quitté l'événement ${eventId}`);
-    
-    socket.to(`event:${eventId}`).emit('user:left', {
-      username: socket.username,
-      message: `${socket.username} a quitté le chat`,
-      timestamp: new Date(),
-    });
-  });
+      // Quitter toutes les autres rooms d'événements
+      const rooms = Array.from(socket.rooms);
+      rooms.forEach((room) => {
+        if (room.startsWith('event_')) {
+          socket.leave(room);
+        }
+      });
 
-  // Envoyer un message dans un chat
-socket.on('message:send', async (data) => {
-  const { eventId, message, userId, username } = data;  // ✅ Récupérer aussi userId et username
-  
-  if (!message || message.trim() === '') {
-    return socket.emit('error', { message: 'Message vide' });
-  }
-  
-  // Vérifier que toutes les données sont présentes
-  if (!userId || !username) {
-    console.error('❌ Données manquantes:', data);
-    return socket.emit('error', { message: 'Données utilisateur manquantes' });
-  }
+      // Rejoindre la nouvelle room
+      const roomName = `event_${eventId}`;
+      socket.join(roomName);
 
-    try {
-      // Sauvegarder le message dans la DB
-      const savedMessage = await MessageService.saveMessage(
+      // Récupérer les messages existants
+      const messages = await messageService.getEventMessages(eventId, 50);
+      socket.emit('previous_messages', messages);
+
+      // Notifier les autres utilisateurs
+      socket.to(roomName).emit('user_joined', {
+        userId: socket.userId || null,
+        username: socket.username || 'Invité',
         eventId,
-        userId,
-        username,
+      });
+    } catch (error) {
+      console.error('Erreur join_event:', error);
+      socket.emit('error', { message: 'Erreur lors de la connexion au chat' });
+    }
+  });
+
+  // Quitter une room d'événement
+  socket.on('leave_event', (eventId) => {
+    const roomName = `event_${eventId}`;
+    console.log(`👋 ${socket.username || socket.id} quitte l'événement ${eventId}`);
+
+    socket.to(roomName).emit('user_left', {
+      userId: socket.userId || null,
+      username: socket.username || 'Invité',
+      eventId,
+    });
+
+    socket.leave(roomName);
+  });
+
+  // Envoyer un message
+  socket.on('send_message', async (data) => {
+    try {
+      const { eventId, message } = data;
+
+      if (!eventId || !message) {
+        socket.emit('error', { message: 'Données manquantes' });
+        return;
+      }
+
+      console.log(`💬 Message de ${socket.username || 'Invité'} dans événement ${eventId}:`, message);
+
+      // Sauvegarder le message en base de données
+      const savedMessage = await messageService.createMessage(
+        eventId,
+        socket.userId || null,
+        socket.username || 'Invité',
         message
       );
-      
-      const messageData = {
-        id: savedMessage.id,
-        userId: userId,
-        username: username,
-        message,
-        timestamp: new Date(),
-      };
-      
-      // Envoyer le message à tous les participants
-      io.to(`event:${eventId}`).emit('message:received', messageData);
-      
-      console.log(`💬 Message de ${socket.username} dans l'événement ${eventId}`);
+
+      // Envoyer le message à tous les utilisateurs dans la room
+      const roomName = `event_${eventId}`;
+      io.to(roomName).emit('new_message', savedMessage);
     } catch (error) {
-      console.error('Erreur envoi message:', error);
+      console.error('Erreur send_message:', error);
       socket.emit('error', { message: 'Erreur lors de l\'envoi du message' });
     }
   });
 
-  // L'utilisateur tape un message (typing indicator)
-  socket.on('typing:start', (eventId) => {
-    socket.to(`event:${eventId}`).emit('user:typing', {
-      username: socket.username,
-      userId: socket.userId,
-    });
+  // Supprimer un message
+  socket.on('delete_message', async (data) => {
+    try {
+      const { messageId, eventId } = data;
+
+      if (!messageId || !eventId) {
+        socket.emit('error', { message: 'Données manquantes' });
+        return;
+      }
+
+      const deleted = await messageService.deleteMessage(messageId, socket.userId || null);
+
+      if (deleted) {
+        const roomName = `event_${eventId}`;
+        io.to(roomName).emit('message_deleted', { messageId });
+      } else {
+        socket.emit('error', { message: 'Impossible de supprimer le message' });
+      }
+    } catch (error) {
+      console.error('Erreur delete_message:', error);
+      socket.emit('error', { message: 'Erreur lors de la suppression du message' });
+    }
   });
 
-  socket.on('typing:stop', (eventId) => {
-    socket.to(`event:${eventId}`).emit('user:stopped_typing', {
-      username: socket.username,
-      userId: socket.userId,
+  // Utilisateur en train de taper
+  socket.on('typing', (data) => {
+    const { eventId } = data;
+    if (eventId) {
+      const roomName = `event_${eventId}`;
+      socket.to(roomName).emit('user_typing', { username: socket.username || 'Invité' });
+    }
+  });
+
+  // Utilisateur a arrêté de taper
+  socket.on('stop_typing', (data) => {
+    const { eventId } = data;
+    if (eventId) {
+      const roomName = `event_${eventId}`;
+      socket.to(roomName).emit('user_stop_typing', { username: socket.username || 'Invité' });
+    }
+  });
+
+  // Déconnexion
+  socket.on('disconnect', () => {
+    console.log('❌ Déconnexion socket:', socket.id);
+
+    const rooms = Array.from(socket.rooms);
+    rooms.forEach((room) => {
+      if (room.startsWith('event_')) {
+        socket.to(room).emit('user_left', {
+          userId: socket.userId || null,
+          username: socket.username || 'Invité',
+        });
+      }
     });
   });
 };
-
-module.exports = handleChatEvents;

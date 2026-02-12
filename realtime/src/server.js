@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 // Démarrer le serveur
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
 server.listen(PORT, () => {
   console.log(`🚀 Serveur Node.js démarré sur http://localhost:${PORT}`);
   console.log(`🔌 WebSocket prêt pour les connexions`);

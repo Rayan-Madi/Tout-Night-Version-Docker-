@@ -1,15 +1,15 @@
 from pathlib import Path
 from datetime import timedelta
-from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -69,10 +69,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.getenv('DB_NAME', 'toutnight_db'),
+        'USER': os.getenv('DB_USER', 'toutnight_user'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'ToutNight2026!SecurePass'),
+        'HOST': os.getenv('DB_HOST', 'mysql'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
     }
-
 }
 
 # Custom User Model
@@ -132,13 +139,38 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# CORS Configuration (pour React)
+# CORS Configuration (pour React via Nginx)
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',  # Vite dev server
+    'http://localhost',           # ← AJOUTE CETTE LIGNE (Nginx port 80)
+    'http://localhost:80',        # ← AJOUTE CETTE LIGNE
+    'http://127.0.0.1',          # ← AJOUTE CETTE LIGNE
+    'http://localhost:5173',      # Vite dev server (garde si tu développes en local)
     'http://127.0.0.1:5173',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Ajoute aussi ces configurations
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
 # Service temps réel Node.js
-REALTIME_SERVICE_URL = config('REALTIME_SERVICE_URL')
+REALTIME_SERVICE_URL = os.getenv('REALTIME_SERVICE_URL', 'http://nodejs:4000')
