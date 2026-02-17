@@ -78,7 +78,7 @@ function EditEvent() {
     setError('');
 
     try {
-      // ✅ Formatter les dates correctement
+      //  Formatter les dates correctement
       const formatDate = (dateStr) => {
         if (!dateStr) return null;
         if (dateStr.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) return dateStr;
@@ -112,7 +112,7 @@ function EditEvent() {
       console.error('❌ Status:', err.response?.status);
       console.error('❌ Erreur data:', err.response?.data);
 
-      // ✅ Afficher l'erreur lisible
+      //  Afficher l'erreur lisible
       let errorMessage = 'Erreur lors de la modification :\n\n';
       if (err.response?.data) {
         Object.entries(err.response.data).forEach(([key, val]) => {
@@ -159,7 +159,7 @@ function EditEvent() {
     <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '0 1rem' }}>
       <h1 style={{ color: 'white', marginBottom: '2rem' }}>✏️ Modifier l'événement</h1>
       
-      {/* ✅ Affichage de l'erreur */}
+      {/*  Affichage de l'erreur */}
       {error && (
         <div style={{ 
           padding: '1rem', 
