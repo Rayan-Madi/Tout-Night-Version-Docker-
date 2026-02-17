@@ -50,9 +50,9 @@ C'est tout ! Plus besoin d'installer Python, Node.js ou MySQL séparément.
 
 ### 1. Cloner le projet
 ```bash
+
 git clone https://github.com/Rayan-Madi/Tout-Night-Version-Docker
-cd Tout-NIhgt-Version-Docker
-```
+cd Tout-Night-Version-Docker
 
 ### 2. Configurer les variables d'environnement
 

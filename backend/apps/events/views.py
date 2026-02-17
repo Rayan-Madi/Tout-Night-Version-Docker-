@@ -84,6 +84,13 @@ class MyEventsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        # Debug: afficher l'utilisateur effectuant la requête
+        try:
+            user = self.request.user
+            print(f"[MyEventsView] Utilisateur: {user} (id={getattr(user, 'id', None)})")
+        except Exception:
+            print("[MyEventsView] Impossible de récupérer request.user")
+
         return Event.objects.filter(organizer=self.request.user).order_by('-created_at')
 
 

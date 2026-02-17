@@ -55,6 +55,7 @@ class EventListSerializer(serializers.ModelSerializer):
     """Serializer simplifié pour la liste des événements"""
     
     organizer_name = serializers.CharField(source='organizer.username', read_only=True)
+    organizer_id = serializers.IntegerField(source='organizer.id', read_only=True)
     seats_sold = serializers.ReadOnlyField()
     is_full = serializers.ReadOnlyField()
     
@@ -62,6 +63,7 @@ class EventListSerializer(serializers.ModelSerializer):
         model = Event
         fields = [
             'id', 'title', 'slug', 'category', 'status', 'organizer_name',
+            'organizer_id',
             'start_date', 'location', 'city', 'price', 'capacity',
             'available_seats', 'cover_image', 'seats_sold', 'is_full'
         ]
